@@ -255,3 +255,11 @@ code{background:var(--yellow-soft);padding:1px 6px;border-radius:6px;font-size:.
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
 }
+
+.brand img {
+    height: 32px !important;
+    width: auto !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
