@@ -6,7 +6,7 @@
    Paste your Google Apps Script "Web app" URL between the quotes.
    Leave it empty to try the site in demo mode (ID: GYM-1234).      */
 const CONFIG = {
-  SHEET_URL: "https://script.google.com/macros/s/AKfycbyGVz1qXZllaNjAQ64656rEugx9sANy8BHpQ645-Onh_u36p8xY8rSTufJgbmos7Zs5/exec",
+  SHEET_URL: "https://script.google.com/macros/s/AKfycbzO_Ln0gxPeQpDyCnj5UAE7CYt7rIaRY2RNRVTYqKOWy6ETLuVhZwEQ2QckaIn7-hKN/exec",
   DEMO_ID: "GYM-1234",
   DEMO_NAME: "Demo Member"
 };
