@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IronLog · Gym Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR (visible after login) ============ -->
+<header class="topbar" id="topbar" hidden>
+  <a class="brand" href="#day"><span class="brand-plate"></span>IronLog</a>
+  <nav class="tabs" id="tabs">
+    <a href="#day"    data-nav="day"><span class="ico">✅</span><span>Day marker</span></a>
+    <a href="#week"   data-nav="week"><span class="ico">🏋️</span><span>Weekly plan</span></a>
+    <a href="#diet"   data-nav="diet"><span class="ico">🍛</span><span>Diet</span></a>
+    <a href="#logout" data-nav="logout"><span class="ico">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="who" id="who"></div>
+</header>
+
+<main>
+
+<!-- ============ PAGE 1 · LOGIN (home) ============ -->
+<section class="view" id="view-login">
+  <div class="login">
+    <div class="login-art" aria-hidden="true">
+      <div class="barbell">
+        <div class="side left">
+          <span class="plate p1"></span><span class="plate p2"></span><span class="plate p3"></span>
+        </div>
+        <div class="bar"></div>
+        <div class="side right">
+          <span class="plate p1"></span><span class="plate p2"></span><span class="plate p3"></span>
+        </div>
+      </div>
+      <h1>Show up.<br>Log it.<br>Repeat.</h1>
+      <p>Your gym days, your weekly split and your meals, in one place.</p>
+    </div>
+
+    <form class="login-card" id="loginForm" autocomplete="off" novalidate>
+      <h2>Member login</h2>
+      <p class="sub">Enter the ID your gym gave you. No password needed.</p>
+
+      <label for="memberId">Member ID</label>
+      <input id="memberId" type="text" placeholder="GYM-1234" maxlength="12" spellcheck="false" required>
+
+      <label>Type the characters you see</label>
+      <div class="captcha-row">
+        <canvas id="captcha" width="170" height="54" aria-label="Captcha image"></canvas>
+        <button type="button" class="icon-btn" id="captchaRefresh" title="New captcha" aria-label="New captcha">↻</button>
+      </div>
+      <input id="captchaInput" type="text" placeholder="Captcha" maxlength="5" spellcheck="false" required>
+
+      <p class="error" id="loginError" role="alert"></p>
+      <button class="btn primary" id="loginBtn" type="submit"><span>Log in</span></button>
+      <p class="hint" id="demoHint" hidden>Demo mode: use ID <b>GYM-1234</b>. Connect Google Sheets in <code>app.js</code> to use real IDs.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ PAGE 2 · DAY MARKER ============ -->
+<section class="view page" id="view-day" hidden>
+  <div class="page-head">
+    <h2>Day marker</h2>
+    <p>Finished today's session? Mark it and keep the streak alive.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <label for="dayDate">Date</label>
+      <input id="dayDate" type="date">
+      <label for="dayNumber">Day number</label>
+      <input id="dayNumber" type="number" min="1" placeholder="e.g. 12">
+      <button class="btn primary big" id="markBtn"><span>Mark this day</span></button>
+      <p class="error" id="dayError" role="alert"></p>
+    </div>
+
+    <div class="panel stats">
+      <div class="stat"><b id="statTotal">0</b><span>days done</span></div>
+      <div class="stat"><b id="statStreak">0</b><span>day streak</span></div>
+      <div class="stat"><b id="statMonth">0</b><span>this month</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Last 28 days</h3>
+    <div class="strip" id="strip"></div>
+    <h3 class="mt">Recent check-ins</h3>
+    <ul class="history" id="history"></ul>
+  </div>
+</section>
+
+<!-- ============ PAGE 3 · WEEKLY PLAN ============ -->
+<section class="view page" id="view-week" hidden>
+  <div class="page-head">
+    <h2>Weekly plan</h2>
+    <p>Tap a day to see the full workout. Tick exercises as you finish them.</p>
+  </div>
+  <div class="days" id="days"></div>
+</section>
+
+<!-- ============ PAGE 4 · DIET ============ -->
+<section class="view page" id="view-diet" hidden>
+  <div class="page-head">
+    <h2>Diet plan</h2>
+    <p>Built for an Indian kitchen and a student-friendly budget. Prices in ₹, approximate.</p>
+  </div>
+
+  <div class="switch" id="dietSwitch">
+    <button class="on" data-diet="veg">🥦 Vegetarian</button>
+    <button data-diet="nonveg">🍗 Non-vegetarian</button>
+    <span class="knob"></span>
+  </div>
+
+  <div class="diet-total panel">
+    <div><b id="dTotal">₹0</b><span>per day</span></div>
+    <div><b id="dProtein">0 g</b><span>protein</span></div>
+    <div><b id="dKcal">0</b><span>kcal</span></div>
+    <div><b id="dMonth">₹0</b><span>per month</span></div>
+  </div>
+
+  <div class="meals" id="meals"></div>
+
+  <div class="panel">
+    <h3>Budget protein cheat-sheet</h3>
+    <table class="tbl" id="proteinTable"></table>
+    <p class="hint">Prices vary by city and season. Drink 3–4 litres of water daily.</p>
+  </div>
+</section>
+
+<!-- ============ PAGE 5 · LOGOUT ============ -->
+<section class="view page" id="view-logout" hidden>
+  <div class="logout-card" id="logoutCard">
+    <div class="wave">👋</div>
+    <h2>Leaving already?</h2>
+    <p>Your check-ins are saved. You can log back in any time with your ID.</p>
+    <div class="row">
+      <button class="btn ghost" id="stayBtn">Stay</button>
+      <button class="btn primary" id="logoutBtn"><span>Log out</span></button>
+    </div>
+  </div>
+  <div class="bye" id="bye" hidden>
+    <div class="wave big">💪</div>
+    <h2>See you at the gym!</h2>
+    <p>Logged out safely.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ MODAL: DAY DETAIL ============ -->
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="close" id="mClose" aria-label="Close">✕</button>
+    <div class="m-head">
+      <span class="m-emoji" id="mEmoji"></span>
+      <div>
+        <h3 id="mTitle"></h3>
+        <p id="mFocus"></p>
+      </div>
+    </div>
+    <div class="progress"><i id="mBar"></i></div>
+    <p class="progress-text" id="mProgress"></p>
+    <ul class="ex-list" id="mList"></ul>
+    <p class="m-tip" id="mTip"></p>
+  </div>
+</div>
+
+<!-- ============ TICK CELEBRATION ============ -->
+<div class="tick-overlay" id="tick" hidden>
+  <div class="tick-card">
+    <svg viewBox="0 0 120 120" class="tick-svg" aria-hidden="true">
+      <circle class="tick-circle" cx="60" cy="60" r="52"/>
+      <path class="tick-check" d="M34 62 L53 81 L88 42"/>
+    </svg>
+    <div class="tick-emoji" id="tickEmoji">💪</div>
+    <h3 id="tickTitle">Day marked!</h3>
+    <p id="tickMsg"></p>
+  </div>
+  <div class="burst" id="burst"></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
